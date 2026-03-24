@@ -1,0 +1,4 @@
+gspread==6.*
+google-auth==2.*
+requests==2.*
+python-dotenv==1.*
