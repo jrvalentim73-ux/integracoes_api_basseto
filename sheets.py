@@ -1,17 +1,26 @@
+import re
+
 import gspread
 from google.oauth2.service_account import Credentials
 from config import GOOGLE_SHEET_ID, GOOGLE_CREDENTIALS_FILE
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive.readonly",
+    "https://www.googleapis.com/auth/drive",
 ]
+
+
+def _parse_sheet_id(raw):
+    """Extract the spreadsheet ID from a full URL or return as-is."""
+    match = re.search(r"/spreadsheets/d/([a-zA-Z0-9_-]+)", raw)
+    return match.group(1) if match else raw.strip()
 
 
 def _get_worksheet():
     creds = Credentials.from_service_account_file(GOOGLE_CREDENTIALS_FILE, scopes=SCOPES)
     client = gspread.authorize(creds)
-    spreadsheet = client.open_by_key(GOOGLE_SHEET_ID)
+    sheet_id = _parse_sheet_id(GOOGLE_SHEET_ID)
+    spreadsheet = client.open_by_key(sheet_id)
     return spreadsheet.sheet1
 
 
